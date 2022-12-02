@@ -1,24 +1,22 @@
 package dec02
 
-import java.io.File
-
 fun main() {
     fun printAnswers(path: String) {
         println(path)
-        val lines = File(path).readLines()
-        println(lines.sumOf { line ->
+        val guide = java.io.File(path).readLines()
+        println(guide.sumOf { match ->
             mapOf(
-                "B X" to 1, "A X" to 4, "C X" to 7,
-                "C Y" to 2, "B Y" to 5, "A Y" to 8,
-                "A Z" to 3, "C Z" to 6, "B Z" to 9,
-            )[line]!!
+                "B X" to 1, "C Y" to 2, "A Z" to 3,
+                "A X" to 4, "B Y" to 5, "C Z" to 6,
+                "C X" to 7, "A Y" to 8, "B Z" to 9,
+            )[match]!!
         })
-        println(lines.sumOf { line ->
+        println(guide.sumOf { map ->
             mapOf(
-                "A X" to 3, "B X" to 1, "C X" to 2,
+                "B X" to 1, "C X" to 2, "A X" to 3,
                 "A Y" to 4, "B Y" to 5, "C Y" to 6,
-                "A Z" to 8, "B Z" to 9, "C Z" to 7
-            )[line]!!
+                "C Z" to 7, "A Z" to 8, "B Z" to 9
+            )[map]!!
         })
     }
 
