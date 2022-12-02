@@ -1,4 +1,0 @@
-package aoc
-
-class aoc {
-}
