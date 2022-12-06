@@ -29,8 +29,8 @@ fun newStack(input: List<String>): Stacks {
         }
 }
 
-fun Stacks.part1(moves: List<Move>): Stacks = moves.forEach { m ->
-    repeat(m.amount) { this[m.target].add(0, this[m.source].removeFirst()) }
+fun Stacks.part1(moves: List<Move>): Stacks = moves.forEach { move ->
+    repeat(move.amount) { this[move.target].add(0, this[move.source].removeFirst()) }
 }.let { this }
 
 fun Stacks.part2(moves: List<Move>) = moves.forEach { move ->
