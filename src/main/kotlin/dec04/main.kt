@@ -1,23 +1,19 @@
 package dec04
 
+fun IntRange.overlaps(that: IntRange) =
+    this.first <= that.first && that.first <= this.last ||
+    this.first <= that.last && that.first <= this.last
+
+fun IntRange.inside(that: IntRange) =
+    that.first <= this.first && this.last <= that.last
+
 fun main() {
-    fun inside(a: List<Int>) =
-        a[0] <= a[2] && a[3] <= a[1] ||
-        a[2] <= a[0] && a[1] <= a[3]
-
-    fun duplicated(a: List<Int>) =
-        a[0] <= a[2] && a[2] <= a[1] ||
-        a[0] <= a[3] && a[2] <= a[1] ||
-        a[2] <= a[0] && a[0] <= a[3] ||
-        a[2] <= a[1] && a[1] <= a[3]
-
-    listOf("example", "puzzle-input")
-        .forEach { filename ->
-            val input = java.io.File("src/main/kotlin/dec04/$filename")
-                .readLines()
-                .map { it.split(Regex("[,-]")).map { s -> s.toInt() } }
-            println(filename)
-            println("1) ${input.count { inside(it) }}")
-            println("2) ${input.count { duplicated(it) }}")
-        }
+    listOf("example", "puzzle-input").forEach { name ->
+        println(name)
+        val ranges = java.io.File("src/main/kotlin/dec04/$name").readLines()
+            .map { it.split(Regex("[,-]")).map { s -> s.toInt() } }
+            .map { Pair(IntRange(it[0], it[1]), IntRange(it[2], it[3])) }
+        println("1) ${ranges.count { it.first.inside(it.second) || it.second.inside(it.first) }}")
+        println("2) ${ranges.count { it.first.overlaps(it.second) }}")
+    }
 }
