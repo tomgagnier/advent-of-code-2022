@@ -9,19 +9,15 @@ fun main() {
         else -> item - 'A' + 27
     }
 
-    fun printAnswers(path: String) {
-        println(path)
-        val rucksacks = java.io.File(path).readLines()
-
+    listOf("example", "puzzle-input").forEach {
+        println(it)
+        val rucksacks = aoc.file(object {}, it).readLines()
         println(rucksacks
             .map { r -> listOf(r.substring(0, r.length / 2), r.substring(r.length / 2)) }
             .sumOf { l -> priorityOf(sharedItemIn(l)) })
-
-        println(rucksacks
+        println(
+            rucksacks
             .chunked(3)
             .sumOf { l -> priorityOf(sharedItemIn(l)) })
     }
-
-    printAnswers("src/main/kotlin/dec03/example")
-    printAnswers("src/main/kotlin/dec03/puzzle-input")
 }

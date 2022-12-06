@@ -1,17 +1,18 @@
 package dec01
 
-fun main() {
-    fun printAnswers(path: String) {
-        val sortedSums = java.io.File(path)
-            .readText()
-            .split("\n\n")
-            .map { paragraph -> paragraph.lines().sumOf { it.toInt() } }
-            .sorted()
-        println(path)
-        println(sortedSums.takeLast(1).sum())
-        println(sortedSums.takeLast(3).sum())
-    }
+import aoc.file
 
-    printAnswers("src/main/kotlin/dec01/example")
-    printAnswers("src/main/kotlin/dec01/puzzle-input")
+fun main() {
+    fun sortedSum(it: String): List<Int> = file(object {}, it)
+        .readText()
+        .split("\n\n")
+        .map { paragraph -> paragraph.lines().sumOf { it.toInt() } }
+        .sorted()
+
+    listOf("example", "puzzle-input").forEach {
+        println(it)
+        val sortedSums = sortedSum(it)
+        println("\t${sortedSums.takeLast(1).sum()}")
+        println("\t${sortedSums.takeLast(3).sum()}")
+    }
 }

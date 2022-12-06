@@ -42,15 +42,13 @@ fun Stacks.top(): String = this.map { s -> s.first() }.joinToString("")
 
 fun main() {
     listOf("example", "puzzle-input").forEach { name ->
-        val section = java.io.File("src/main/kotlin/${object {}.javaClass.`package`.name}/$name")
+        val (section1, section2) = aoc.file(object {}, name)
             .readText()
             .split("\n\n")
             .map { p -> p.split("\n") }
 
-        val moves = Move.from(section[1])
-
         println(name)
-        println("\t1) ${newStack(section[0]).part1(moves).top()}")
-        println("\t2) ${newStack(section[0]).part2(moves).top()}")
+        println("\t1) ${newStack(section1).part1(Move.from(section2)).top()}")
+        println("\t2) ${newStack(section1).part2(Move.from(section2)).top()}")
     }
 }

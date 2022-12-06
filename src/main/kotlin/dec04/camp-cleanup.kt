@@ -9,10 +9,10 @@ fun IntRange.inside(that: IntRange) =
 
 fun main() {
     listOf("example", "puzzle-input").forEach { name ->
-        println(name)
-        val ranges = java.io.File("src/main/kotlin/dec04/$name").readLines()
+        val ranges = aoc.file(object{}, name).readLines()
             .map { it.split(Regex("[,-]")).map { s -> s.toInt() } }
             .map { Pair(IntRange(it[0], it[1]), IntRange(it[2], it[3])) }
+        println(name)
         println("1) ${ranges.count { it.first.inside(it.second) || it.second.inside(it.first) }}")
         println("2) ${ranges.count { it.first.overlaps(it.second) }}")
     }
