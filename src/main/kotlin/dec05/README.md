@@ -12,7 +12,7 @@ rearranged, the desired crates will be at the top of each stack.
 
 The Elves don't want to interrupt the crane operator during this delicate
 procedure, but they forgot to ask her which crate will end up where, and they
-want to be ready to unload them as soon as possible so they can embark.
+want to be ready to unload them as soon as possible, so they can embark.
 
 They do, however, have a drawing of the starting stacks of crates and the
 rearrangement procedure (your puzzle input). For example:
@@ -71,7 +71,7 @@ Finally, one crate is moved from stack 1 to stack 2:
 
 The Elves just need to know which crate will end up on top of each stack; in
 this example, the top crates are C in stack 1, M in stack 2, and Z in stack 3,
-so you should combine these together and give the Elves the message CMZ.
+so you should combine these together and give the Elves the message `CMZ`.
 
 After the rearrangement procedure completes, what crate ends up on top of each
 stack?
