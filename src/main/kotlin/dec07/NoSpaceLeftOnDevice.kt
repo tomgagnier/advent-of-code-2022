@@ -1,49 +1,56 @@
 package dec07
 
-data class Node(val path: String, val size: Long, var children: MutableSet<String> = mutableSetOf()) {
-    fun dir() = children.isNotEmpty()
-    fun parentOf(node: Node) = node.path.startsWith(path)
+data class Node(val path: String, val size: Long, val children: MutableSet<String> = mutableSetOf()) {
+    fun isDirectory() = children.isNotEmpty()
+    fun isParentOf(node: Node) = node.path.startsWith(path)
 }
 
-typealias Nodes = MutableMap<String, Node>
+fun String.cd(dir: String) =
+    when (dir) {
+        "/" -> "/"
+        ".." -> split("/").dropLast(2).joinToString("/") + "/"
+        else -> "$this$dir/"
+    }
 
-fun toNodes(lines: MutableList<String>, path: String = "", nodes: Nodes = mutableMapOf()): Nodes {
+fun toNodes(lines: List<String>, path: String = "", nodes: Map<String, Node> = mapOf()): Map<String, Node> {
     if (lines.isEmpty()) return nodes
-    val line = lines.removeFirst()
-    if (line.startsWith("$ cd ")) {
-        return toNodes(
-            lines, when (line.substring(5)) {
-                "/" -> "/"
-                ".." -> path.split("/").dropLast(2).joinToString("/") + "/"
-                else -> "$path${line.substring(5)}/"
-            }, nodes
-        )
-    }
-    if (line.startsWith("$ ls")) {
-        nodes[path] = Node(path, 0)
-    } else if (line.startsWith("dir ")) {
-        val fullName = "${path}${line.substring(4)}/"
-        nodes[path]!!.children.add(fullName)
-        nodes[fullName] = Node(fullName, 0)
-    } else {
-        val (size, name) = line.split(" ")
-        val fullName = "$path$name"
-        nodes[path]!!.children.add(fullName)
-        nodes[fullName] = Node(fullName, size.toLong())
-    }
-    return toNodes(lines, path, nodes)
+    val line = lines.first()
+    val rest = lines.drop(1)
+
+    if (line.startsWith("$ cd "))
+        return toNodes(rest, path.cd(line.split(" ")[2]), nodes)
+
+    if (line.startsWith("$ ls"))
+        return toNodes(rest, path, nodes + (path to Node(path, 0)))
+
+    val node =
+        if (line.startsWith("dir ")) {
+            val name = line.split(" ")[1]
+            Node("${path}$name/", 0)
+        } else {
+            val (size, name) = line.split(" ")
+            Node("$path$name", size.toLong())
+        }
+
+    nodes[path]!!.children.add(node.path)
+    return toNodes(rest, path, nodes + (node.path to node))
 }
 
-fun toSizes(nodes: Nodes) = nodes.filterValues { it.dir() }
-    .map { kv -> nodes.filterValues { kv.value.parentOf(it) }.map { it.value.size }.sum() }
+fun Map<String, Node>.toSizes() = this
+    .filterValues { it.isDirectory() }
+    .map { kv ->
+        this.filterValues { kv.value.isParentOf(it) }
+            .map { it.value.size }
+            .sum()
+    }
 
 fun part1(lines: List<String>): Long =
-    toSizes(toNodes(lines.toMutableList())).filter { it < 100_000 }.sum()
+    toNodes(lines).toSizes().filter { it < 100_000 }.sum()
 
 fun part2(lines: List<String>): Long {
     val diskSize = 70_000_000
     val required = 30_000_000
-    val sizes = toSizes(toNodes(lines.toMutableList()))
+    val sizes = toNodes(lines).toSizes()
     val min = required - (diskSize - sizes.max())
     return sizes.filter { it > min }.minOf { it }
 }
