@@ -1,59 +1,34 @@
 package dec07
 
-data class Node(val path: String, val size: Long, val children: MutableSet<String> = mutableSetOf()) {
-    fun isDirectory() = children.isNotEmpty()
-    fun isParentOf(node: Node) = node.path.startsWith(path)
-}
-
-fun String.cd(dir: String) = when (dir) {
+fun String.cd(directory: String) = when (directory) {
     "/" -> "/"
-    ".." -> split("/").dropLast(2).joinToString("/") + "/"
-    else -> "$this$dir/"
+    ".." -> split("/").dropLast(2).joinToString("/", "") + if (this == "/") "" else "/"
+    else -> "$this$directory/"
 }
 
-fun toNodes(lines: List<String>, path: String = "", nodes: Map<String, Node> = mapOf()): Map<String, Node> {
-    if (lines.isEmpty()) return nodes
-
-    val line = lines.first()
-    val rest = lines.drop(1)
-
-    if (line.startsWith("$ cd ")) {
-        val dir = line.split(" ")[2]
-        return toNodes(rest, path.cd(dir), nodes)
-    }
-
-    if (line.startsWith("$ ls")) {
-        return toNodes(rest, path, nodes + (path to Node(path, 0)))
-    }
-
-    val node =
-        if (line.startsWith("dir ")) {
-            val name = line.split(" ")[1]
-            Node("${path}$name/", 0)
-        } else {
-            val (size, name) = line.split(" ")
-            Node("$path$name", size.toLong())
+fun mapOfPathToSize(lines: List<String>): Map<String, Long> = buildMap {
+    var pwd = "/"
+    lines.mapNotNull { Regex("""[$] cd (.*)|(\d+).*""").matchEntire(it) }
+        .forEach {
+            it.groups[1]?.value?.let { dir ->
+                pwd = pwd.cd(dir)
+            } ?: it.groups[2]?.value?.let { bytes ->
+                var path = pwd
+                while (path.isNotEmpty()) {
+                    put(path, getOrElse(path) { 0 } + bytes.toLong())
+                    path = path.cd("..")
+                }
+            }
         }
-
-    nodes[path]!!.children.add(node.path)
-    return toNodes(rest, path, nodes + (node.path to node))
 }
 
-fun Map<String, Node>.toSizes() = this
-    .filterValues { it.isDirectory() }
-    .map { kv ->
-        this.filterValues { kv.value.isParentOf(it) }
-            .map { it.value.size }
-            .sum()
-    }
-
-fun part1(lines: List<String>): Long =
-    toNodes(lines).toSizes().filter { it < 100_000 }.sum()
+fun part1(lines: List<String>): Long = 
+    mapOfPathToSize(lines).values.filter { it < 100_000 }.sum()
 
 fun part2(lines: List<String>): Long {
-    val diskSize = 70_000_000
+    val total = 70_000_000
     val required = 30_000_000
-    val sizes = toNodes(lines).toSizes()
-    val min = required - (diskSize - sizes.max())
+    val sizes = mapOfPathToSize(lines).values
+    val min = required - (total - sizes.max())
     return sizes.filter { it > min }.minOf { it }
 }

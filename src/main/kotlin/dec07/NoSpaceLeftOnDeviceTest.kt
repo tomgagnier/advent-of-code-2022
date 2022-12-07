@@ -7,6 +7,12 @@ class NoSpaceLeftOnDeviceTest {
     val example = aoc.lines(this, "example")
     val input = aoc.lines(this, "input")
 
+    @Test fun cd() {
+        assertEquals("/a/", "/a/b/".cd(".."))
+        assertEquals("/", "/a".cd(".."))
+        assertEquals("", "/".cd(".."))
+    }
+
     @Test fun part1() {
         assertEquals(95437, part1(example))
         assertEquals(1206825, part1(input))

@@ -103,7 +103,7 @@ i indirectly (a contains e which contains i). Directory d has total size
 24933642. As the outermost directory, / contains every file. Its total size is
 48381165, the sum of the size of every file. To begin, find all of the
 directories with a total size of at most 100000, then calculate the sum of their
-total sizes. In the example above, these directories are a and e; the sum of
+total sizes. In the example above, these directories are a and e; the sum of[NoSpaceLeftOnDeviceTest.kt](NoSpaceLeftOnDeviceTest.kt)
 their total sizes is 95437 (94853 + 584). (As in this example, this process can
 count files more than once!)
 
@@ -114,7 +114,7 @@ Your puzzle answer was 1206825.
 
 --- Part Two ---
 
-Now, you're ready to choose a directory to delete.
+Now, you're ready to choose a directory to delete.[NoSpaceLeftOnDeviceTest.kt](NoSpaceLeftOnDeviceTest.kt)
 
 The total disk space available to the filesystem is 70000000. To run the update,
 you need unused space of at least 30000000. You need to find a directory you can
