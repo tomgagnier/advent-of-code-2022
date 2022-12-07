@@ -29,6 +29,7 @@ fun part2(lines: List<String>): Long {
     val total = 70_000_000
     val required = 30_000_000
     val sizes = mapOfPathToSize(lines).values
-    val min = required - (total - sizes.max())
+    val used = sizes.max()
+    val min = required - (total - used)
     return sizes.filter { it > min }.minOf { it }
 }
