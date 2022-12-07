@@ -5,23 +5,26 @@ data class Node(val path: String, val size: Long, val children: MutableSet<Strin
     fun isParentOf(node: Node) = node.path.startsWith(path)
 }
 
-fun String.cd(dir: String) =
-    when (dir) {
-        "/" -> "/"
-        ".." -> split("/").dropLast(2).joinToString("/") + "/"
-        else -> "$this$dir/"
-    }
+fun String.cd(dir: String) = when (dir) {
+    "/" -> "/"
+    ".." -> split("/").dropLast(2).joinToString("/") + "/"
+    else -> "$this$dir/"
+}
 
 fun toNodes(lines: List<String>, path: String = "", nodes: Map<String, Node> = mapOf()): Map<String, Node> {
     if (lines.isEmpty()) return nodes
+
     val line = lines.first()
     val rest = lines.drop(1)
 
-    if (line.startsWith("$ cd "))
-        return toNodes(rest, path.cd(line.split(" ")[2]), nodes)
+    if (line.startsWith("$ cd ")) {
+        val dir = line.split(" ")[2]
+        return toNodes(rest, path.cd(dir), nodes)
+    }
 
-    if (line.startsWith("$ ls"))
+    if (line.startsWith("$ ls")) {
         return toNodes(rest, path, nodes + (path to Node(path, 0)))
+    }
 
     val node =
         if (line.startsWith("dir ")) {
