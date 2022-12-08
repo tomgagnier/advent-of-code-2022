@@ -2,24 +2,23 @@ package dec07
 
 fun String.cd(directory: String) = when (directory) {
     "/" -> "/"
-    ".." -> split("/").dropLast(2).joinToString("/", "") + if (this == "/") "" else "/"
+    ".." -> removeSuffix("/").replaceAfterLast("/", "")
     else -> "$this$directory/"
 }
 
 fun mapOfPathToSize(lines: List<String>): Map<String, Long> = buildMap {
     var pwd = "/"
-    lines.mapNotNull { Regex("""[$] cd (.*)|(\d+).*""").matchEntire(it) }
-        .forEach {
-            it.groups[1]?.value?.let { dir ->
-                pwd = pwd.cd(dir)
-            } ?: it.groups[2]?.value?.let { bytes ->
-                var path = pwd
-                while (path.isNotEmpty()) {
-                    put(path, getOrElse(path) { 0 } + bytes.toLong())
-                    path = path.cd("..")
-                }
+    lines.mapNotNull { Regex("""\$ cd (.*)|(\d+).*""").matchEntire(it) }.forEach {
+        it.groups[1]?.value?.let { dir ->
+            pwd = pwd.cd(dir)
+        } ?: it.groups[2]?.value?.let { bytes ->
+            var path = pwd
+            while (path.isNotEmpty()) {
+                put(path, getOrElse(path) { 0 } + bytes.toLong())
+                path = path.cd("..")
             }
         }
+    }
 }
 
 fun part1(lines: List<String>): Long = 
