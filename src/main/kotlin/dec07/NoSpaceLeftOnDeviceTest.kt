@@ -13,6 +13,10 @@ class NoSpaceLeftOnDeviceTest {
         assertEquals("", "/".cd(".."))
     }
 
+    @Test fun paths() {
+        assertEquals(listOf("/a/b/c", "/a/b/", "/a/", "/"), "/a/b/c".paths())
+    }
+
     @Test fun part1() {
         assertEquals(95437, part1(example))
         assertEquals(1206825, part1(input))
