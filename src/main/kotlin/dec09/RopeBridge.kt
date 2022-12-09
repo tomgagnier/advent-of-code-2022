@@ -1,5 +1,7 @@
 package dec09
 
+import kotlin.math.abs
+
 typealias Knot = Pair<Int, Int>
 typealias Move = Pair<String, Int>
 
@@ -10,21 +12,16 @@ fun Knot.down() = this.first to this.second - 1
 fun Knot.left() = this.first - 1 to this.second
 fun Knot.right() = this.first + 1 to this.second
 
-fun Knot.follow(h: Knot): Knot {
-    return when (h - this) {
-        0 to 2 -> up()
-        0 to -2 -> down()
-        -2 to 0 -> left()
-        2 to 0 -> right()
-        2 to 2, 2 to 1, 1 to 2 -> right().up()
-        -2 to 2, -2 to 1, -1 to 2 -> left().up()
-        -2 to -2, -2 to -1, -1 to -2 -> left().down()
-        2 to -2, 1 to -2, 2 to -1 -> right().down()
-        else -> this
-    }
+fun Knot.follow(head: Knot): Knot {
+    val delta = head - this
+    return if (abs(delta.first) <= 1 && abs(delta.second) <= 1) this
+    else if (delta.first == 0) if (delta.second < 0) down() else up()
+    else if (delta.second == 0) if (delta.first < 0) left() else right()
+    else if (delta.first < 0) if (delta.second < 0) left().down() else left().up()
+    else if (delta.second < 0) right().down() else right().up()
 }
 
-data class RopeBridge(val numberOfKnots:Int) {
+data class RopeBridge(val numberOfKnots: Int) {
     val knots = MutableList(numberOfKnots) { 0 to 0 }
     val tailPositions = mutableSetOf(knots.last())
 
