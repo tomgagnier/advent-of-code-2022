@@ -12,7 +12,7 @@ data class Forest(val trees: List<String>) {
     val maxJ = trees[0].length
     val insideTrees = (1..maxI - 2).flatMap { i -> (1..maxJ - 2).map { j -> i to j } }
 
-    fun at(tree: Pair<Int, Int>) = trees[tree.first][tree.second]
+    operator fun get(tree: Pair<Int, Int>) = trees[tree.first][tree.second]
 
     fun lineOfSights(tree: Pair<Int, Int>) = listOf(
         (tree.first - 1 downTo 0).map { i -> i to tree.second },
@@ -24,13 +24,13 @@ data class Forest(val trees: List<String>) {
     fun invisible(): List<Pair<Int, Int>> = insideTrees.filter { insideTree ->
         lineOfSights(insideTree).all { blockingTrees ->
             blockingTrees.any { blockingTree ->
-                at(blockingTree) >= at(insideTree)
+                get(blockingTree) >= get(insideTree)
             }
         }
     }
 
     fun treesVisibleFrom(tree: Pair<Int, Int>) = lineOfSights(tree)
-        .map { it.takeUntil { at(tree) <= at(it) } }
+        .map { it.takeUntil { get(tree) <= get(it) } }
 
     fun scenicScoreOf(tree: Pair<Int, Int>) = treesVisibleFrom(tree)
         .map { los -> los.size }.product()
