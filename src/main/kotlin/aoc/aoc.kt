@@ -22,3 +22,5 @@ inline fun <T> Iterable<T>.takeUntil(predicate: (T) -> Boolean): List<T> {
 
 fun Iterable<Int>.product(): Int =
     reduce { a, b -> a * b }
+
+operator fun Pair<Int, Int>.minus(p: Pair<Int, Int>) = first - p.first to second - p.second
