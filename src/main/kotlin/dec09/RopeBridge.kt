@@ -2,46 +2,40 @@ package dec09
 
 import kotlin.math.abs
 
-typealias Knot = Pair<Int, Int>
-typealias Move = Pair<String, Int>
+data class V2(val x: Int, val y: Int) {
+    operator fun minus(p: V2) = V2(x - p.x, y - p.y)
+    operator fun plus(p: V2) = V2(x + p.x, y + p.y)
 
-operator fun Knot.minus(p: Knot) = first - p.first to second - p.second
+    override fun toString(): String = "($x, $y)"
 
-fun Knot.up() = this.first to this.second + 1
-fun Knot.down() = this.first to this.second - 1
-fun Knot.left() = this.first - 1 to this.second
-fun Knot.right() = this.first + 1 to this.second
-
-fun Knot.follow(head: Knot): Knot {
-    val delta = head - this
-    return if (abs(delta.first) <= 1 && abs(delta.second) <= 1) this
-    else if (delta.first == 0) if (delta.second < 0) down() else up()
-    else if (delta.second == 0) if (delta.first < 0) left() else right()
-    else if (delta.first < 0) if (delta.second < 0) left().down() else left().up()
-    else if (delta.second < 0) right().down() else right().up()
+    fun distance() = maxOf(abs(x), abs(y))
 }
 
+enum class Direction(x: Int, y: Int) {
+    U(0, 1), D(0, -1), L(-1, 0), R(1, 0);
+
+    val offset = V2(x, y)
+}
+
+data class Move(val direction: Direction, val count: Int)
+
+fun offset(offset: V2): V2 =
+    if (offset.distance() <= 1) V2(0, 0)
+    else V2(offset.x.coerceIn(-1, 1), offset.y.coerceIn(-1, 1))
+
 data class RopeBridge(val numberOfKnots: Int) {
-    val knots = MutableList(numberOfKnots) { 0 to 0 }
+    val knots = MutableList(numberOfKnots) { V2(0, 0) }
     val tailPositions = mutableSetOf(knots.last())
 
-    fun move(m: Move) = repeat(m.second) { move(m.first) }
-
-    fun move(direction: String) {
-        when (direction) {
-            "U" -> knots[0] = (knots[0]).up()
-            "D" -> knots[0] = knots[0].down()
-            "L" -> knots[0] = knots[0].left()
-            "R" -> knots[0] = knots[0].right()
-            else -> error("unknown direction $direction")
-        }
-        (1 until knots.size).forEach { knots[it] = knots[it].follow(knots[it - 1]) }
-        tailPositions.add(knots.last())
+    fun move(m: Move) = repeat(m.count) {
+        knots[0] = knots[0] + m.direction.offset
+        knots.indices.zipWithNext {i, j -> knots[j] += offset(knots[i] - knots[j]) }
+        tailPositions += knots.last()
     }
 }
 
 fun parseMoves(moves: String): List<Move> =
-    moves.lines().map { it.split(" ") }.map { it[0] to it[1].toInt() }
+    moves.lines().map { it.split(" ") }.map { Move(Direction.valueOf(it[0]), it[1].toInt()) }
 
 fun numberOfTailPositions(numberOfKnots: Int, moves: String): Int {
     val rope = RopeBridge(numberOfKnots)
