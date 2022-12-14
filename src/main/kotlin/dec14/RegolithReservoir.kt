@@ -18,7 +18,7 @@ data class RegolithReservoir(val rocks: Set<P>, val floor: Int?) {
         fun withAbyss(text: String) = RegolithReservoir(rocks(text), null)
         fun withFloor(text: String): RegolithReservoir = RegolithReservoir(rocks(text), 2)
 
-        fun rocks(text: String) = text.lines().map { l ->
+        fun rocks(text: String) = text.lines().asSequence().map { l ->
             l.split("->")
                 .map { p -> p.trim().split(",") }
                 .map { a -> P(a[0].toInt(), a[1].toInt()) }.zipWithNext()
@@ -30,11 +30,11 @@ data class RegolithReservoir(val rocks: Set<P>, val floor: Int?) {
         }.flatten().toSet()
     }
 
-    override fun toString() = (0..maxY).map { y ->
+    override fun toString() = (0..maxY).joinToString("\n") { y ->
         (occupied.minOf { it.x }..occupied.maxOf { it.x }).map { x -> P(x, y) }.joinToString("") { p ->
             if (p == source) "+" else if (p in rocks) "#" else if (p in occupied) "o" else "."
         }
-    }.joinToString("\n")
+    }
 
     fun releaseSand(): Boolean {
         var position = source
