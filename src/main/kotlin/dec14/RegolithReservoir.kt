@@ -1,23 +1,35 @@
 package dec14
 
-data class P(val x: Int, val y: Int) {
-    operator fun plus(that: P) = P(x + that.x, y + that.y)
+data class Point(val x: Int, val y: Int) {
+    operator fun plus(that: Point) = Point(x + that.x, y + that.y)
     override fun toString(): String = "($x,$y)"
+
+    fun toCardinalRange(p2: Point) =
+        if (y == p2.y) {
+            if (x < p2.x) (x..p2.x).map { x -> Point(x, y) }
+            else (x downTo p2.x).map { x -> Point(x, y) }
+        } else if (x == p2.x) {
+            if (y < p2.y) (y..p2.y).map { y -> Point(x, y) }
+            else (y downTo p2.y).map { y -> Point(x, y) }
+        } else {
+            error("expecting horizontal or vertical line segment")
+        }
 }
 
-fun scan(text: String) = text.lines().asSequence().map { l ->
-    l.split("->")
-        .map { p -> p.trim().split(",") }
-        .map { a -> P(a[0].toInt(), a[1].toInt()) }
-        .zipWithNext()
-}.flatten().map {
-    if (it.first.x < it.second.x) (it.first.x..it.second.x).map { x -> P(x, it.first.y) }
-    else if (it.first.x > it.second.x) (it.first.x downTo it.second.x).map { x -> P(x, it.first.y) }
-    else if (it.first.y < it.second.y) (it.first.y..it.second.y).map { y -> P(it.first.x, y) }
-    else (it.first.y downTo it.second.y).map { y -> P(it.first.x, y) }
-}.flatten().toSet()
+fun scan(cave: String) = cave.lines().asSequence()
+    .map { line ->
+        line.split("->")
+            .map { it.trim().split(",").map { n -> n.toInt() } }
+            .map { Point(it[0], it[1]) }
+            .zipWithNext()
+    }
+    .flatten()
+    .map { it.first.toCardinalRange(it.second) }
+    .flatten()
+    .toSet()
 
-data class RegolithReservoir(val rocks: Set<P>, val floor: Int?) {
+
+data class RegolithReservoir(val rocks: Set<Point>, val floor: Int?) {
     val maxY = rocks.maxOf { it.y }
 
     companion object {
@@ -25,11 +37,45 @@ data class RegolithReservoir(val rocks: Set<P>, val floor: Int?) {
         fun withFloor(text: String): RegolithReservoir = RegolithReservoir(scan(text), 2)
     }
 
-    val source = P(500, 0)
+    val source = Point(500, 0)
+
+    fun inTheAbyss(p: Point) = floor == null && p.y == maxY
+    fun onTheFloor(p: Point) = floor != null && p.y == maxY + floor - 1
+
+    fun sand() = Sand()
+
+    inner class Sand : Iterator<Point> {
+        var sand = mutableListOf<Point>()
+        var next: Point = source
+
+        override fun next(): Point {
+            sand.add(next)
+            return next
+        }
+
+        override fun hasNext(): Boolean {
+            next = source
+            var peek = move(source)
+            while (peek != null) {
+                next = peek
+                peek = move(peek)
+            }
+            val inTheAbyss = inTheAbyss(next)
+            val onTheFloor = onTheFloor(next)
+            val inSand = next in sand
+            return !(inSand || inTheAbyss || onTheFloor)
+        }
+
+        fun move(p: Point): Point? = listOf(Point(0, 1), Point(-1, 1), Point(1, 1))
+            .map { p + it }
+            .find { it !in sand && !onTheFloor(p) && !inTheAbyss(p) }
+    }
+
+
     var occupied = rocks.toMutableSet()
 
     override fun toString() = (0..maxY).joinToString("\n") { y ->
-        (occupied.minOf { it.x }..occupied.maxOf { it.x }).map { x -> P(x, y) }.joinToString("") { p ->
+        (occupied.minOf { it.x }..occupied.maxOf { it.x }).map { x -> Point(x, y) }.joinToString("") { p ->
             if (p == source) "+" else if (p in rocks) "#" else if (p in occupied) "o" else "."
         }
     }
@@ -44,10 +90,7 @@ data class RegolithReservoir(val rocks: Set<P>, val floor: Int?) {
         return !inTheAbyss(position) && occupied.add(position)
     }
 
-    fun inTheAbyss(p: P) = floor == null && p.y == maxY
-    fun onTheFloor(p: P) = floor != null && p.y == maxY + floor - 1
-
-    fun move(p: P): P? = listOf(P(0, 1), P(-1, 1), P(1, 1))
+    fun move(p: Point): Point? = listOf(Point(0, 1), Point(-1, 1), Point(1, 1))
         .map { p + it }
         .find { it !in occupied && !onTheFloor(p) && !inTheAbyss(p) }
 
