@@ -38,22 +38,18 @@ data class RegolithReservoir(val rocks: Set<P>, val floor: Int?) {
         var position = source
         var next = move(position)
         while (next != null) {
-            if (floor == null && next.y > maxY) return false
             position = next
             next = move(position)
         }
-        return occupied.add(position)
+        return !inTheAbyss(position) && occupied.add(position)
     }
+
+    fun inTheAbyss(p: P) = floor == null && p.y == maxY
+    fun onTheFloor(p: P) = floor != null && p.y == maxY + floor - 1
 
     fun move(p: P): P? = listOf(P(0, 1), P(-1, 1), P(1, 1))
         .map { p + it }
-        .find {
-            it !in occupied &&
-            if (floor == null)
-                true //it.y in 0 until maxY + 1
-            else
-                it.y < floor + maxY
-        }
+        .find { it !in occupied && !onTheFloor(p) && !inTheAbyss(p) }
 
     fun maxSand(): Int {
         while (releaseSand()) Unit
