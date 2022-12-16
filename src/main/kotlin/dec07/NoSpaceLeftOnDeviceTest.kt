@@ -1,11 +1,12 @@
 package dec07
 
+import aoc.text
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class NoSpaceLeftOnDeviceTest {
-    val example = aoc.lines(this, "example")
-    val input = aoc.lines(this, "input")
+    val example = text(this, "example").lines()
+    val input = text(this, "input").lines()
 
     @Test fun cd() {
         assertEquals("/a/", "/a/b/".cd(".."))

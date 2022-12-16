@@ -1,11 +1,12 @@
 package dec03
 
+import aoc.text
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class RucksackReorginizationTest {
-    val example = aoc.lines(this, "example")
-    val input = aoc.lines(this, "input")
+    val example = text(this, "example").lines()
+    val input = text(this, "input").lines()
 
     @Test fun `priority of`() {
         assertEquals(1, priorityOf('a'))

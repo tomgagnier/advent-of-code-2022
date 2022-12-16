@@ -1,6 +1,5 @@
 package dec08
 
-import aoc.product
 import aoc.takeUntil
 
 data class Forest(val trees: List<String>) {
@@ -30,10 +29,10 @@ data class Forest(val trees: List<String>) {
     }
 
     fun treesVisibleFrom(tree: Pair<Int, Int>) = lineOfSights(tree)
-        .map { it.takeUntil { get(tree) <= get(it) } }
+        .map { los -> los.takeUntil { get(tree) <= get(it) } }
 
     fun scenicScoreOf(tree: Pair<Int, Int>) = treesVisibleFrom(tree)
-        .map { los -> los.size }.product()
+        .map { los -> los.size }.reduce(Int::times)
 
     fun maxScenicScore() = insideTrees.maxOf { scenicScoreOf(it) }
 

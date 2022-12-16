@@ -1,11 +1,12 @@
 package dec02
 
+import aoc.text
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class RockPaperScissorsTest {
-    val example = aoc.lines(this, "example")
-    val input = aoc.lines(this, "input")
+    val example = text(this, "example").lines()
+    val input = text(this, "input").lines()
 
     @Test fun `part 1`() {
         assertEquals(15, part1(example))

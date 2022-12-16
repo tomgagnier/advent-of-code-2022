@@ -9,7 +9,12 @@ class AocTest {
         assertFalse("01x234".isDigits())
     }
 
-    @Test fun `combinations of`() {
-        assertEquals(listOf(1 to 2, 1 to 3, 1 to 4, 2 to 3, 2 to 4, 3 to 4), combinationsOf(listOf(1, 2, 3, 4)))
+    @Test fun `aoc file`() {
+        assertEquals("src/main/kotlin/aoc/input", file(this, "input").path)
+        assertTrue(file(this, "input").exists())
+    }
+
+    @Test fun `aoc text`() {
+        assertTrue(text(this, "input").startsWith("Kubla Khan"))
     }
 }

@@ -35,8 +35,12 @@ class DistressSignalTest {
         assertEquals(
             ListPacket(
                 listOf(
-                    ListPacket(listOf(IntPacket(1))),
-                    ListPacket(listOf(IntPacket(2), IntPacket(3), IntPacket(4)))
+                    ListPacket(
+                        listOf(
+                            ListPacket(listOf(IntPacket(1))),
+                            ListPacket(listOf(IntPacket(2), IntPacket(3), IntPacket(4)))
+                        )
+                    )
                 )
             ),
             Packet.parse("[[1],[2,3,4]]")
@@ -46,7 +50,7 @@ class DistressSignalTest {
     @Test fun compare() {
         assertTrue(Packet.parse("[[1],[2,3,4]]") == Packet.parse("[[1],[2,3,4]]"))
         assertTrue(Packet.parse("[[1],[2,3,4]]") < Packet.parse("[[1],[2,3,5]]"))
-        assertTrue(Packet.parse("[1,[2,3,4]]") < Packet.parse("[[1],[2,3,3]]"))
+        assertTrue(Packet.parse("[1,[2,3,4]]") > Packet.parse("[[1],[2,3,3]]"))
         assertTrue(Packet.parse("[[1],[2,3,4]]") > Packet.parse("[[1],[2,3,3]]"))
     }
 
